@@ -111,7 +111,7 @@ export function getLocale() {
 }
 
 /** Core translate function */
-export function useTranslator(name:string) {
+export function getTranslator(name:string) {
   return function(key:string, params = {}){
     // try current locale first
     const primary = dictionaries[locale.value]?.[name] || {};
@@ -151,7 +151,7 @@ export function useI18n() {
     },
     setLocale,
     addLocaleModule,
-    useTranslator,
+    getTranslator,
     loadLocale, // expose if you want to prefetch manually
     getLocale,
   };

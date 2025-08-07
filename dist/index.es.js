@@ -1,8 +1,8 @@
 import { ref as s, watch as L, computed as w } from "vue";
-const A = "en", a = "en";
+const g = "en", a = "en";
 let v = s([]);
-const c = {}, f = s([]), u = s(A);
-function g(e) {
+const c = {}, f = s([]), u = s(g);
+function A(e) {
   v.value.push(e), i(u.value);
 }
 function m(e = {}, t = {}) {
@@ -77,8 +77,8 @@ function j() {
       return f.value.includes(t);
     },
     setLocale: h,
-    addLocaleModule: g,
-    useTranslator: b,
+    addLocaleModule: A,
+    getTranslator: b,
     loadLocale: i,
     // expose if you want to prefetch manually
     getLocale: y
@@ -92,10 +92,10 @@ L(
   { immediate: !0 }
 );
 export {
-  g as addLocaleModule,
+  A as addLocaleModule,
   y as getLocale,
+  b as getTranslator,
   i as loadLocale,
   h as setLocale,
-  j as useI18n,
-  b as useTranslator
+  j as useI18n
 };

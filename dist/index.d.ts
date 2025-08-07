@@ -7,14 +7,14 @@ export declare function setLocale(newLocale: string): Promise<void>;
 /** Get current locale string */
 export declare function getLocale(): string;
 /** Core translate function */
-export declare function useTranslator(name: string): (key: string, params?: {}) => any;
+export declare function getTranslator(name: string): (key: string, params?: {}) => any;
 /** Composable for Vue components */
 export declare function useI18n(): {
     locale: import('vue').ComputedRef<string>;
     isLocaleLoaded: (temp: string) => any;
     setLocale: typeof setLocale;
     addLocaleModule: typeof addLocaleModule;
-    useTranslator: typeof useTranslator;
+    getTranslator: typeof getTranslator;
     loadLocale: typeof loadLocale;
     getLocale: typeof getLocale;
 };
