@@ -21,7 +21,7 @@ const loaded = ref<any>([]);
 const locale = ref(DEFAULT_LOCALE);
 
 /** Set a new base URL template if needed */
-export function addLocaleModule(template:any) {
+function addLocaleModule(template:any) {
   localeModuleTemplates.value.push(template);
   loadLocale(locale.value);
 }
@@ -68,7 +68,7 @@ function interpolate(str:any, params:any = {}) {
 }
 
 /** Load locale module from remote URL and merge into dictionary */
-export async function loadLocale(localeKey:string) {
+async function loadLocale(localeKey:string) {
   try {
     for (let tem of localeModuleTemplates.value) {
       const url:string = tem.template.replace('{locale}', encodeURIComponent(localeKey));
@@ -100,18 +100,18 @@ export async function loadLocale(localeKey:string) {
 }
 
 /** Set current locale (async loads if needed) */
-export async function setLocale(newLocale:string) {
+async function setLocale(newLocale:string) {
   locale.value = newLocale;
   await loadLocale(newLocale);
 }
 
 /** Get current locale string */
-export function getLocale() {
+function getLocale() {
   return locale.value;
 }
 
 /** Core translate function */
-export function getTranslator(name:string) {
+export function useTranslator(name:string) {
   return function(key:string, params = {}){
     // try current locale first
     const primary = dictionaries[locale.value]?.[name] || {};
@@ -151,7 +151,6 @@ export function useI18n() {
     },
     setLocale,
     addLocaleModule,
-    getTranslator,
     loadLocale, // expose if you want to prefetch manually
     getLocale,
   };
