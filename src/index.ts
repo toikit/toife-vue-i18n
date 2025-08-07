@@ -11,7 +11,7 @@ const DEFAULT_LOCALE = 'en';
 const FALLBACK_LOCALE = 'en';
 
 /** Base URL template for locale modules; replace `{locale}` when loading */
-let localeModuleUrlTemplates = ref<Array<any>>([]);
+let localeModuleTemplates = ref<Array<any>>([]);
 
 /** In-memory cache of loaded dictionaries */
 const dictionaries: any = {}; // e.g. { vi: { ... }, en: { ... } }
@@ -21,8 +21,8 @@ const loaded = ref<any>([]);
 const locale = ref(DEFAULT_LOCALE);
 
 /** Set a new base URL template if needed */
-export function addLocaleModuleUrlTemplate(template:string) {
-  localeModuleUrlTemplates.value.push(template);
+export function addLocaleModule(template:any) {
+  localeModuleTemplates.value.push(template);
   loadLocale(locale.value);
 }
 
@@ -70,10 +70,10 @@ function interpolate(str:any, params:any = {}) {
 /** Load locale module from remote URL and merge into dictionary */
 export async function loadLocale(localeKey:string) {
   try {
-    for (let tem of localeModuleUrlTemplates.value) {
-      const url:string = tem.replace('{locale}', encodeURIComponent(localeKey));
+    for (let tem of localeModuleTemplates.value) {
+      const url:string = tem.template.replace('{locale}', encodeURIComponent(localeKey));
 
-      if (loaded.value.includes(url)) {
+      if (loaded.value.includes(tem.name)) {
         continue;
       }
       
@@ -84,8 +84,9 @@ export async function loadLocale(localeKey:string) {
         throw new Error(`Locale module ${localeKey} did not export an object`);
       }
 
-      dictionaries[localeKey] = mergeDeep(dictionaries[localeKey] || {}, msgs);
-      loaded.value.push(url);
+      dictionaries[localeKey] = dictionaries[localeKey] || {};
+      dictionaries[localeKey][tem.name] = mergeDeep(dictionaries[localeKey]?.[tem.name] || {}, msgs);
+      loaded.value.push(tem.name);
     }
 
     return dictionaries[localeKey];
@@ -110,32 +111,34 @@ export function getLocale() {
 }
 
 /** Core translate function */
-export function t(key:string, params = {}) {
-  // try current locale first
-  const primary = dictionaries[locale.value] || {};
-  let entry = getNested(primary, key);
+export function useTranslator(name:string) {
+  return function(key:string, params = {}){
+    // try current locale first
+    const primary = dictionaries[locale.value]?.[name] || {};
+    let entry = getNested(primary, key);
 
-  // fallback to fallback locale if missing
-  if (entry === undefined && locale.value !== FALLBACK_LOCALE) {
-    const fb = dictionaries[FALLBACK_LOCALE] || {};
-    entry = getNested(fb, key);
-  }
-
-  if (entry === undefined) {
-    // missing entirely
-    return interpolate(key, params);
-  }
-
-  if (typeof entry === 'function') {
-    // functions receive params object
-    try {
-      return entry(params);
-    } catch (e) {
-      console.warn('i18n function error for key', key, e);
-      return '';
+    // fallback to fallback locale if missing
+    if (entry === undefined && locale.value !== FALLBACK_LOCALE) {
+      const fb = dictionaries[FALLBACK_LOCALE]?.[name] || {};
+      entry = getNested(fb, key);
     }
+
+    if (entry === undefined) {
+      // missing entirely
+      return interpolate(key, params);
+    }
+
+    if (typeof entry === 'function') {
+      // functions receive params object
+      try {
+        return entry(params);
+      } catch (e) {
+        console.warn('i18n function error for key', key, e);
+        return '';
+      }
+    }
+    return interpolate(entry, params);
   }
-  return interpolate(entry, params);
 }
 
 /** Composable for Vue components */
@@ -147,8 +150,8 @@ export function useI18n() {
       return loaded.value.includes(url);
     },
     setLocale,
-    addLocaleModuleUrlTemplate,
-    t,
+    addLocaleModule,
+    useTranslator,
     loadLocale, // expose if you want to prefetch manually
     getLocale,
   };
