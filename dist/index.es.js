@@ -31,14 +31,13 @@ async function i(e) {
       const o = n.replace("{locale}", encodeURIComponent(e));
       if (a.has(o))
         continue;
-      a.add(o);
       const t = await import(
         /* @vite-ignore */
         o + "?t=" + (/* @__PURE__ */ new Date()).getTime()
       ), r = t.default ?? t;
       if (typeof r != "object" || r === null)
         throw new Error(`Locale module ${e} did not export an object`);
-      u[e] = v(u[e] || {}, r);
+      u[e] = v(u[e] || {}, r), a.add(o);
     }
     return u[e];
   } catch {

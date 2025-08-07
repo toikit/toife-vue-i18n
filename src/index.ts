@@ -78,7 +78,6 @@ export async function loadLocale(localeKey:string) {
       }
       
       // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
-      loaded.add(url);
       const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
       const msgs = module.default ?? module;
       if (typeof msgs !== 'object' || msgs === null) {
@@ -86,6 +85,7 @@ export async function loadLocale(localeKey:string) {
       }
 
       dictionaries[localeKey] = mergeDeep(dictionaries[localeKey] || {}, msgs);
+      loaded.add(url);
     }
 
     return dictionaries[localeKey];
