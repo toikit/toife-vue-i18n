@@ -1,7 +1,7 @@
-import { ref as d, watch as m, computed as L } from "vue";
+import { ref as f, watch as m, computed as L } from "vue";
 const w = "en", l = "en";
-let p = d([]);
-const u = {}, a = /* @__PURE__ */ new Set(), c = d(w);
+let p = f([]);
+const u = {}, a = f([]), c = f(w);
 function y(e) {
   p.value.push(e), i(c.value);
 }
@@ -12,7 +12,7 @@ function v(e = {}, n = {}) {
   }
   return e;
 }
-function f(e, n) {
+function s(e, n) {
   if (!e) return;
   const o = n.split(".");
   let t = e;
@@ -22,14 +22,14 @@ function f(e, n) {
   }
   return t;
 }
-function s(e, n = {}) {
+function d(e, n = {}) {
   return String(e).replace(/\{(\w+)\}/g, (o, t) => n[t] === void 0 ? `{${t}}` : String(n[t]));
 }
 async function i(e) {
   try {
     for (let n of p.value) {
       const o = n.replace("{locale}", encodeURIComponent(e));
-      if (a.has(o))
+      if (a.value.includes(o))
         continue;
       const t = await import(
         /* @vite-ignore */
@@ -37,49 +37,49 @@ async function i(e) {
       ), r = t.default ?? t;
       if (typeof r != "object" || r === null)
         throw new Error(`Locale module ${e} did not export an object`);
-      u[e] = v(u[e] || {}, r), a.add(o);
+      u[e] = v(u[e] || {}, r), a.value.push(o);
     }
     return u[e];
   } catch {
     return e !== l ? i(l) : {};
   }
 }
-async function h(e) {
+async function A(e) {
   c.value = e, await i(e);
 }
-function A() {
+function g() {
   return c.value;
 }
-function g(e, n = {}) {
+function h(e, n = {}) {
   const o = u[c.value] || {};
-  let t = f(o, e);
+  let t = s(o, e);
   if (t === void 0 && c.value !== l) {
     const r = u[l] || {};
-    t = f(r, e);
+    t = s(r, e);
   }
   if (t === void 0)
-    return s(e, n);
+    return d(e, n);
   if (typeof t == "function")
     try {
       return t(n);
     } catch (r) {
       return console.warn("i18n function error for key", e, r), "";
     }
-  return s(t, n);
+  return d(t, n);
 }
 function C() {
   return {
     locale: L(() => c.value),
     isLocaleLoaded: (e) => {
       const n = e.replace("{locale}", encodeURIComponent(c.value));
-      return a.has(n);
+      return a.value.includes(n);
     },
-    setLocale: h,
+    setLocale: A,
     addLocaleModuleUrlTemplate: y,
-    t: g,
+    t: h,
     loadLocale: i,
     // expose if you want to prefetch manually
-    getLocale: A
+    getLocale: g
   };
 }
 m(
@@ -91,9 +91,9 @@ m(
 );
 export {
   y as addLocaleModuleUrlTemplate,
-  A as getLocale,
+  g as getLocale,
   i as loadLocale,
-  h as setLocale,
-  g as t,
+  A as setLocale,
+  h as t,
   C as useI18n
 };

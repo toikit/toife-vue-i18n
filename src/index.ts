@@ -15,7 +15,7 @@ let localeModuleUrlTemplates = ref<Array<any>>([]);
 
 /** In-memory cache of loaded dictionaries */
 const dictionaries: any = {}; // e.g. { vi: { ... }, en: { ... } }
-const loaded = new Set();
+const loaded = ref<any>([]);
 
 /** Reactive current locale */
 const locale = ref(DEFAULT_LOCALE);
@@ -73,7 +73,7 @@ export async function loadLocale(localeKey:string) {
     for (let tem of localeModuleUrlTemplates.value) {
       const url:string = tem.replace('{locale}', encodeURIComponent(localeKey));
 
-      if (loaded.has(url)) {
+      if (loaded.value.includes(url)) {
         continue;
       }
       
@@ -85,7 +85,7 @@ export async function loadLocale(localeKey:string) {
       }
 
       dictionaries[localeKey] = mergeDeep(dictionaries[localeKey] || {}, msgs);
-      loaded.add(url);
+      loaded.value.push(url);
     }
 
     return dictionaries[localeKey];
@@ -144,7 +144,7 @@ export function useI18n() {
     locale: computed(() => locale.value),
     isLocaleLoaded: (temp: string) => {
       const url = temp.replace('{locale}', encodeURIComponent(locale.value));
-      return loaded.has(url);
+      return loaded.value.includes(url);
     },
     setLocale,
     addLocaleModuleUrlTemplate,

@@ -11,7 +11,7 @@ export declare function t(key: string, params?: {}): any;
 /** Composable for Vue components */
 export declare function useI18n(): {
     locale: import('vue').ComputedRef<string>;
-    isLocaleLoaded: (temp: string) => boolean;
+    isLocaleLoaded: (temp: string) => any;
     setLocale: typeof setLocale;
     addLocaleModuleUrlTemplate: typeof addLocaleModuleUrlTemplate;
     t: typeof t;
