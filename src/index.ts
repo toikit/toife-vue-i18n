@@ -16,6 +16,7 @@ let localeModuleTemplates = ref<Array<any>>([]);
 /** In-memory cache of loaded dictionaries */
 const dictionaries: any = {}; // e.g. { vi: { ... }, en: { ... } }
 const loaded = ref<any>([]);
+const templateLoaded = ref<any>([]);
 
 /** Reactive current locale */
 const locale = ref(DEFAULT_LOCALE);
@@ -73,10 +74,12 @@ async function loadLocale(localeKey:string) {
     for (let tem of localeModuleTemplates.value) {
       const url:string = tem.template.replace('{locale}', encodeURIComponent(localeKey));
 
-      if (loaded.value.includes(tem.name)) {
+      if (templateLoaded.value.includes(url)) {
         continue;
       }
       
+      templateLoaded.value.push(url);
+
       // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
       const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
       const msgs = module.default ?? module;
@@ -145,9 +148,8 @@ export function useTranslator(name:string) {
 export function useI18n() {
   return {
     locale: computed(() => locale.value),
-    isLocaleLoaded: (temp: string) => {
-      const url = temp.replace('{locale}', encodeURIComponent(locale.value));
-      return loaded.value.includes(url);
+    isLocaleLoaded: (name: string) => {
+      return loaded.value.includes(name);
     },
     setLocale,
     addLocaleModule,

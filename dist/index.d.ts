@@ -11,7 +11,7 @@ export declare function useTranslator(name: string): (key: string, params?: {}) 
 /** Composable for Vue components */
 export declare function useI18n(): {
     locale: import('vue').ComputedRef<string>;
-    isLocaleLoaded: (temp: string) => any;
+    isLocaleLoaded: (name: string) => any;
     setLocale: typeof setLocale;
     addLocaleModule: typeof addLocaleModule;
     loadLocale: typeof loadLocale;
