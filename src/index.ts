@@ -23,7 +23,14 @@ const locale = ref(DEFAULT_LOCALE);
 
 /** Set a new base URL template if needed */
 function addLocaleModule(template:any) {
-  localeModuleTemplates.value.push(template);
+  if (Array.isArray(template)) {
+    template.forEach((tem) => {
+      localeModuleTemplates.value.push(tem);
+    });
+  } else {
+    localeModuleTemplates.value.push(template);
+  }
+
   loadLocale(locale.value);
 }
 
@@ -153,7 +160,6 @@ export function useI18n() {
     },
     setLocale,
     addLocaleModule,
-    loadLocale, // expose if you want to prefetch manually
     getLocale,
   };
 }

@@ -1,94 +1,94 @@
-import { ref as l, watch as w, computed as h } from "vue";
-const A = "en", a = "en";
-let v = l([]);
-const u = {}, m = l([]), s = l([]), c = l(A);
-function g(t) {
-  v.value.push(t), i(c.value);
+import { ref as a, watch as h, computed as A } from "vue";
+const w = "en", i = "en";
+let s = a([]);
+const u = {}, m = a([]), d = a([]), c = a(w);
+function y(e) {
+  Array.isArray(e) ? e.forEach((t) => {
+    s.value.push(t);
+  }) : s.value.push(e), f(c.value);
 }
-function L(t = {}, e = {}) {
-  for (const r of Object.keys(e)) {
-    const n = e[r], o = t[r];
-    n && typeof n == "object" && !Array.isArray(n) && !(n instanceof Function) ? t[r] = L(o && typeof o == "object" ? o : {}, n) : t[r] = n;
+function L(e = {}, t = {}) {
+  for (const r of Object.keys(t)) {
+    const n = t[r], o = e[r];
+    n && typeof n == "object" && !Array.isArray(n) && !(n instanceof Function) ? e[r] = L(o && typeof o == "object" ? o : {}, n) : e[r] = n;
   }
-  return t;
+  return e;
 }
-function d(t, e) {
-  if (!t) return;
-  const r = e.split(".");
-  let n = t;
+function p(e, t) {
+  if (!e) return;
+  const r = t.split(".");
+  let n = e;
   for (const o of r) {
     if (n == null) return;
     n = n[o];
   }
   return n;
 }
-function p(t, e = {}) {
-  return String(t).replace(/\{(\w+)\}/g, (r, n) => e[n] === void 0 ? `{${n}}` : String(e[n]));
+function v(e, t = {}) {
+  return String(e).replace(/\{(\w+)\}/g, (r, n) => t[n] === void 0 ? `{${n}}` : String(t[n]));
 }
-async function i(t) {
+async function f(e) {
   try {
-    for (let e of v.value) {
-      const r = e.template.replace("{locale}", encodeURIComponent(t));
-      if (s.value.includes(r))
+    for (let t of s.value) {
+      const r = t.template.replace("{locale}", encodeURIComponent(e));
+      if (d.value.includes(r))
         continue;
-      s.value.push(r);
+      d.value.push(r);
       const n = await import(
         /* @vite-ignore */
         r + "?t=" + (/* @__PURE__ */ new Date()).getTime()
       ), o = n.default ?? n;
       if (typeof o != "object" || o === null)
-        throw new Error(`Locale module ${t} did not export an object`);
-      u[t] = u[t] || {}, u[t][e.name] = L(u[t]?.[e.name] || {}, o), m.value.push(e.name);
+        throw new Error(`Locale module ${e} did not export an object`);
+      u[e] = u[e] || {}, u[e][t.name] = L(u[e]?.[t.name] || {}, o), m.value.push(t.name);
     }
-    return u[t];
+    return u[e];
   } catch {
-    return t !== a ? i(a) : {};
+    return e !== i ? f(i) : {};
   }
 }
-async function y(t) {
-  c.value = t, await i(t);
+async function g(e) {
+  c.value = e, await f(e);
 }
 function b() {
   return c.value;
 }
-function C(t) {
-  return function(e, r = {}) {
-    const n = u[c.value]?.[t] || {};
-    let o = d(n, e);
-    if (o === void 0 && c.value !== a) {
-      const f = u[a]?.[t] || {};
-      o = d(f, e);
+function j(e) {
+  return function(t, r = {}) {
+    const n = u[c.value]?.[e] || {};
+    let o = p(n, t);
+    if (o === void 0 && c.value !== i) {
+      const l = u[i]?.[e] || {};
+      o = p(l, t);
     }
     if (o === void 0)
-      return p(e, r);
+      return v(t, r);
     if (typeof o == "function")
       try {
         return o(r);
-      } catch (f) {
-        return console.warn("i18n function error for key", e, f), "";
+      } catch (l) {
+        return console.warn("i18n function error for key", t, l), "";
       }
-    return p(o, r);
+    return v(o, r);
   };
 }
-function E() {
+function C() {
   return {
-    locale: h(() => c.value),
-    isLocaleLoaded: (t) => m.value.includes(t),
-    setLocale: y,
-    addLocaleModule: g,
-    loadLocale: i,
-    // expose if you want to prefetch manually
+    locale: A(() => c.value),
+    isLocaleLoaded: (e) => m.value.includes(e),
+    setLocale: g,
+    addLocaleModule: y,
     getLocale: b
   };
 }
-w(
+h(
   c,
-  async (t, e) => {
-    e !== void 0 && await i(t);
+  async (e, t) => {
+    t !== void 0 && await f(e);
   },
   { immediate: !0 }
 );
 export {
-  E as useI18n,
-  C as useTranslator
+  C as useI18n,
+  j as useTranslator
 };

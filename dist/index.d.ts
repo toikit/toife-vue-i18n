@@ -1,7 +1,5 @@
 /** Set a new base URL template if needed */
 declare function addLocaleModule(template: any): void;
-/** Load locale module from remote URL and merge into dictionary */
-declare function loadLocale(localeKey: string): Promise<any>;
 /** Set current locale (async loads if needed) */
 declare function setLocale(newLocale: string): Promise<void>;
 /** Get current locale string */
@@ -14,7 +12,6 @@ export declare function useI18n(): {
     isLocaleLoaded: (name: string) => any;
     setLocale: typeof setLocale;
     addLocaleModule: typeof addLocaleModule;
-    loadLocale: typeof loadLocale;
     getLocale: typeof getLocale;
 };
 export {};
