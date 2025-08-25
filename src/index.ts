@@ -66,37 +66,34 @@ function interpolate(str:any, params:any = {}) {
   });
 }
 
+async function __load(name:string, url:string, localeKey:string){
+  try {
+    // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
+    const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
+    const msgs = module.default ?? module;
+    if (typeof msgs !== 'object' || msgs === null) {
+      throw new Error(`Locale module ${localeKey} did not export an object`);
+    }
+    dictionaries[localeKey] = dictionaries[localeKey] || {};
+    dictionaries[localeKey][name] = mergeDeep(dictionaries[localeKey]?.[name] || {}, msgs);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaded.value.push(name);
+  }
+}
+
 /** Load locale module from remote URL and merge into dictionary */
 async function loadLocale(localeKey:string) {
-  try {
-    for (let tem of localeModuleTemplates.value) {
-      const url:string = tem.template.replace('{locale}', encodeURIComponent(localeKey));
+  for (let tem of localeModuleTemplates.value) {
+    const url:string = tem.template.replace('{locale}', encodeURIComponent(localeKey));
 
-      if (templateLoaded.value.includes(url)) {
-        continue;
-      }
-      
-      templateLoaded.value.push(url);
-
-      // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
-      const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
-      const msgs = module.default ?? module;
-      if (typeof msgs !== 'object' || msgs === null) {
-        throw new Error(`Locale module ${localeKey} did not export an object`);
-      }
-
-      dictionaries[localeKey] = dictionaries[localeKey] || {};
-      dictionaries[localeKey][tem.name] = mergeDeep(dictionaries[localeKey]?.[tem.name] || {}, msgs);
-      loaded.value.push(tem.name);
+    if (templateLoaded.value.includes(url)) {
+      continue;
     }
-
-    return dictionaries[localeKey];
-  } catch (e) {
-    if (localeKey !== fallbackLocale) {
-      // fallback
-      return loadLocale(fallbackLocale);
-    }
-    return {};
+    
+    templateLoaded.value.push(url);
+    __load(tem.name, url, localeKey);
   }
 }
 
