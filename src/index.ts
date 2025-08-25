@@ -1,17 +1,8 @@
 import { ref, computed, watch } from 'vue';
 
-/**
- * Simple i18n loader that:
- * - Dynamically imports remote ES module JS files (e.g. vi.js, en.js)
- * - Merges into dictionaries while preserving functions
- * - Supports nested keys (dot path), interpolation, fallback
- */
-
-const DEFAULT_LOCALE = 'en';
-const FALLBACK_LOCALE = 'en';
-
 /** Base URL template for locale modules; replace `{locale}` when loading */
 let localeModuleTemplates = ref<Array<any>>([]);
+let fallbackLocale = '';
 
 /** In-memory cache of loaded dictionaries */
 const dictionaries: any = {}; // e.g. { vi: { ... }, en: { ... } }
@@ -19,7 +10,7 @@ const loaded = ref<any>([]);
 const templateLoaded = ref<any>([]);
 
 /** Reactive current locale */
-const locale = ref(DEFAULT_LOCALE);
+const locale = ref('');
 
 /** Set a new base URL template if needed */
 function addLocaleModule(template:any) {
@@ -101,9 +92,9 @@ async function loadLocale(localeKey:string) {
 
     return dictionaries[localeKey];
   } catch (e) {
-    if (localeKey !== FALLBACK_LOCALE) {
+    if (localeKey !== fallbackLocale) {
       // fallback
-      return loadLocale(FALLBACK_LOCALE);
+      return loadLocale(fallbackLocale);
     }
     return {};
   }
@@ -113,6 +104,10 @@ async function loadLocale(localeKey:string) {
 async function setLocale(newLocale:string) {
   locale.value = newLocale;
   await loadLocale(newLocale);
+}
+
+function setFallbackLocale(l:string){
+  fallbackLocale = l;
 }
 
 /** Get current locale string */
@@ -128,8 +123,8 @@ export function useTranslator(name:string) {
     let entry = getNested(primary, key);
 
     // fallback to fallback locale if missing
-    if (entry === undefined && locale.value !== FALLBACK_LOCALE) {
-      const fb = dictionaries[FALLBACK_LOCALE]?.[name] || {};
+    if (entry === undefined && locale.value !== fallbackLocale) {
+      const fb = dictionaries[fallbackLocale]?.[name] || {};
       entry = getNested(fb, key);
     }
 
@@ -158,6 +153,7 @@ export function useI18n() {
     isLocaleLoaded: (name: string) => {
       return loaded.value.includes(name);
     },
+    setFallbackLocale,
     setLocale,
     addLocaleModule,
     getLocale,
