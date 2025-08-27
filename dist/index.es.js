@@ -1,10 +1,10 @@
-import { ref as i, watch as h, computed as L } from "vue";
-let a = i([]), f = "";
-const u = {}, y = i([]), d = i([]), c = i("");
+import { ref as l, watch as h, computed as L } from "vue";
+let i = l([]), f = "";
+const c = l({}), y = l([]), d = l([]), u = l("");
 function w(e) {
   Array.isArray(e) ? e.forEach((n) => {
-    a.value.push(n);
-  }) : a.value.push(e), s(c.value);
+    i.value.push(n);
+  }) : i.value.push(e), s(u.value);
 }
 function m(e = {}, n = {}) {
   for (const o of Object.keys(n)) {
@@ -13,7 +13,7 @@ function m(e = {}, n = {}) {
   }
   return e;
 }
-function p(e, n) {
+function v(e, n) {
   if (!e) return;
   const o = n.split(".");
   let t = e;
@@ -23,7 +23,7 @@ function p(e, n) {
   }
   return t;
 }
-function v(e, n = {}) {
+function p(e, n = {}) {
   return String(e).replace(/\{(\w+)\}/g, (o, t) => n[t] === void 0 ? `{${t}}` : String(n[t]));
 }
 async function b(e, n, o) {
@@ -34,7 +34,7 @@ async function b(e, n, o) {
     ), r = t.default ?? t;
     if (typeof r != "object" || r === null)
       throw new Error(`Locale module ${o} did not export an object`);
-    u[o] = u[o] || {}, u[o][e] = m(u[o]?.[e] || {}, r);
+    c.value[o] = c.value[o] || {}, c.value[o][e] = m(c.value[o]?.[e] || {}, r);
   } catch (t) {
     console.log(t);
   } finally {
@@ -42,42 +42,42 @@ async function b(e, n, o) {
   }
 }
 async function s(e) {
-  for (let n of a.value) {
+  for (let n of i.value) {
     const o = n.template.replace("{locale}", encodeURIComponent(e));
     d.value.includes(o) || (d.value.push(o), b(n.name, o, e));
   }
 }
 async function g(e) {
-  c.value = e, await s(e);
+  u.value = e, await s(e);
 }
 function j(e) {
   f = e;
 }
 function A() {
-  return c.value;
+  return u.value;
 }
 function _(e) {
   return function(n, o = {}) {
-    const t = u[c.value]?.[e] || {};
-    let r = p(t, n);
-    if (r === void 0 && c.value !== f) {
-      const l = u[f]?.[e] || {};
-      r = p(l, n);
+    const t = c.value[u.value]?.[e] || {};
+    let r = v(t, n);
+    if (r === void 0 && u.value !== f) {
+      const a = c.value[f]?.[e] || {};
+      r = v(a, n);
     }
     if (r === void 0)
-      return v(n, o);
+      return p(n, o);
     if (typeof r == "function")
       try {
         return r(o);
-      } catch (l) {
-        return console.warn("i18n function error for key", n, l), "";
+      } catch (a) {
+        return console.warn("i18n function error for key", n, a), "";
       }
-    return v(r, o);
+    return p(r, o);
   };
 }
 function x() {
   return {
-    locale: L(() => c.value),
+    locale: L(() => u.value),
     isLocaleLoaded: (e) => y.value.includes(e),
     setFallbackLocale: j,
     setLocale: g,
@@ -86,7 +86,7 @@ function x() {
   };
 }
 h(
-  c,
+  u,
   async (e, n) => {
     n !== void 0 && await s(e);
   },

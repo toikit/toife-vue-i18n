@@ -5,7 +5,7 @@ let localeModuleTemplates = ref<Array<any>>([]);
 let fallbackLocale = '';
 
 /** In-memory cache of loaded dictionaries */
-const dictionaries: any = {}; // e.g. { vi: { ... }, en: { ... } }
+const dictionaries = ref<any>({}); // e.g. { vi: { ... }, en: { ... } }
 const loaded = ref<any>([]);
 const templateLoaded = ref<any>([]);
 
@@ -74,8 +74,8 @@ async function __load(name:string, url:string, localeKey:string){
     if (typeof msgs !== 'object' || msgs === null) {
       throw new Error(`Locale module ${localeKey} did not export an object`);
     }
-    dictionaries[localeKey] = dictionaries[localeKey] || {};
-    dictionaries[localeKey][name] = mergeDeep(dictionaries[localeKey]?.[name] || {}, msgs);
+    dictionaries.value[localeKey] = dictionaries.value[localeKey] || {};
+    dictionaries.value[localeKey][name] = mergeDeep(dictionaries.value[localeKey]?.[name] || {}, msgs);
   } catch (e) {
     console.log(e);
   } finally {
@@ -116,12 +116,12 @@ function getLocale() {
 export function useTranslator(name:string) {
   return function(key:string, params = {}){
     // try current locale first
-    const primary = dictionaries[locale.value]?.[name] || {};
+    const primary = dictionaries.value[locale.value]?.[name] || {};
     let entry = getNested(primary, key);
 
     // fallback to fallback locale if missing
     if (entry === undefined && locale.value !== fallbackLocale) {
-      const fb = dictionaries[fallbackLocale]?.[name] || {};
+      const fb = dictionaries.value[fallbackLocale]?.[name] || {};
       entry = getNested(fb, key);
     }
 
