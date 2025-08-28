@@ -66,7 +66,7 @@ function interpolate(str:any, params:any = {}) {
   });
 }
 
-async function __load(name:string, url:string, localeKey:string){
+async function __load(localeKey:string, name:string, url:string, required:boolean = false){
   try {
     // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
     const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
@@ -76,10 +76,9 @@ async function __load(name:string, url:string, localeKey:string){
     }
     dictionaries.value[localeKey] = dictionaries.value[localeKey] || {};
     dictionaries.value[localeKey][name] = mergeDeep(dictionaries.value[localeKey]?.[name] || {}, msgs);
-  } catch (e) {
-    console.log(e);
-  } finally {
     loaded.value.push(name);
+  } catch (e) {
+    if (!required) loaded.value.push(name);
   }
 }
 
@@ -93,7 +92,7 @@ async function loadLocale(localeKey:string) {
     }
     
     templateLoaded.value.push(url);
-    __load(tem.name, url, localeKey);
+    __load(localeKey, tem.name, url, tem.required);
   }
 }
 
