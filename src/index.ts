@@ -7,7 +7,6 @@ let fallbackLocale = '';
 /** In-memory cache of loaded dictionaries */
 const dictionaries = ref<any>({}); // e.g. { vi: { ... }, en: { ... } }
 const loaded = ref<any>([]);
-const templateLoaded = ref<any>([]);
 
 /** Reactive current locale */
 const locale = ref('');
@@ -66,7 +65,7 @@ function interpolate(str:any, params:any = {}) {
   });
 }
 
-async function __load(localeKey:string, name:string, url:string, required:boolean = false){
+async function __load(localeKey:string, name:string, url:string){
   try {
     // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
     const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
@@ -77,8 +76,13 @@ async function __load(localeKey:string, name:string, url:string, required:boolea
     dictionaries.value[localeKey] = dictionaries.value[localeKey] || {};
     dictionaries.value[localeKey][name] = mergeDeep(dictionaries.value[localeKey]?.[name] || {}, msgs);
     loaded.value.push(name);
+    localStorage.setItem('__data_locale_' + name, JSON.stringify(msgs));
   } catch (e) {
-    if (!required) loaded.value.push(name);
+    let msgs = localStorage.getItem('__data_locale_' + name);
+    if (msgs) {
+      dictionaries.value[localeKey][name] = mergeDeep(dictionaries.value[localeKey]?.[name] || {}, JSON.parse(msgs));
+      loaded.value.push(name);
+    }
   }
 }
 
@@ -86,13 +90,7 @@ async function __load(localeKey:string, name:string, url:string, required:boolea
 async function loadLocale(localeKey:string) {
   for (let tem of localeModuleTemplates.value) {
     const url:string = tem.template.replace('{locale}', encodeURIComponent(localeKey));
-
-    if (templateLoaded.value.includes(url)) {
-      continue;
-    }
-    
-    templateLoaded.value.push(url);
-    __load(localeKey, tem.name, url, tem.required);
+    __load(localeKey, tem.name, url);
   }
 }
 
