@@ -67,6 +67,7 @@ function interpolate(str:any, params:any = {}) {
 
 async function __load(localeKey:string, name:string, url:string){
   try {
+    if (loaded.value.includes(name)) return;
     // dynamic import of remote module; requires the remote file to be an ES module and CORS-enabled if cross-origin
     const module = await import(/* @vite-ignore */ url + '?t=' + (new Date()).getTime());
     const msgs = module.default ?? module;
