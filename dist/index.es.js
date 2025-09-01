@@ -1,98 +1,133 @@
-import { ref as a, watch as _, computed as y } from "vue";
-let f = a([]), s = "";
-const u = a({}), c = a([]), l = a("");
-function h(t) {
-  Array.isArray(t) ? t.forEach((e) => {
-    f.value.push(e);
-  }) : f.value.push(t), v(l.value);
+import { ref as l, watch as y, computed as h } from "vue";
+let f = l([]), d = "";
+const u = l({}), s = l([]), a = l(""), m = "i18nDB", i = "locales";
+function _() {
+  return new Promise((e, t) => {
+    const n = indexedDB.open(m, 1);
+    n.onupgradeneeded = () => {
+      const o = n.result;
+      o.objectStoreNames.contains(i) || o.createObjectStore(i);
+    }, n.onsuccess = () => e(n.result), n.onerror = () => t(n.error);
+  });
 }
-function d(t = {}, e = {}) {
-  for (const r of Object.keys(e)) {
-    const o = e[r], n = t[r];
-    o && typeof o == "object" && !Array.isArray(o) && !(o instanceof Function) ? t[r] = d(n && typeof n == "object" ? n : {}, o) : t[r] = o;
+async function g(e, t) {
+  const n = await _();
+  return new Promise((o, r) => {
+    const c = n.transaction(i, "readwrite");
+    c.objectStore(i).put(t, e), c.oncomplete = () => o(), c.onerror = () => r(c.error);
+  });
+}
+async function j(e) {
+  const t = await _();
+  return new Promise((n, o) => {
+    const c = t.transaction(i, "readonly").objectStore(i).get(e);
+    c.onsuccess = () => n(c.result), c.onerror = () => o(c.error);
+  });
+}
+function D(e) {
+  Array.isArray(e) ? e.forEach((t) => {
+    f.value.push(t);
+  }) : f.value.push(e), p(a.value);
+}
+function v(e = {}, t = {}) {
+  for (const n of Object.keys(t)) {
+    const o = t[n], r = e[n];
+    o && typeof o == "object" && !Array.isArray(o) && !(o instanceof Function) ? e[n] = v(
+      r && typeof r == "object" ? r : {},
+      o
+    ) : e[n] = o;
   }
-  return t;
+  return e;
 }
-function p(t, e) {
-  if (!t) return;
-  const r = e.split(".");
-  let o = t;
-  for (const n of r) {
+function w(e, t) {
+  if (!e) return;
+  const n = t.split(".");
+  let o = e;
+  for (const r of n) {
     if (o == null) return;
-    o = o[n];
+    o = o[r];
   }
   return o;
 }
-function g(t, e = {}) {
-  return String(t).replace(/\{(\w+)\}/g, (r, o) => e[o] === void 0 ? `{${o}}` : String(e[o]));
+function b(e, t = {}) {
+  return String(e).replace(/\{(\w+)\}/g, (n, o) => t[o] === void 0 ? `{${o}}` : String(t[o]));
 }
-async function w(t, e, r) {
+async function L(e, t, n) {
   try {
-    if (c.value.includes(e)) return;
+    if (s.value.includes(t)) return;
     const o = await import(
       /* @vite-ignore */
-      r + "?t=" + (/* @__PURE__ */ new Date()).getTime()
-    ), n = o.default ?? o;
-    if (typeof n != "object" || n === null)
-      throw new Error(`Locale module ${t} did not export an object`);
-    u.value[t] = u.value[t] || {}, u.value[t][e] = d(u.value[t]?.[e] || {}, n), c.value.push(e), localStorage.setItem("__data_locale_" + e, JSON.stringify(n));
+      n + "?t=" + Date.now()
+    ), r = o.default ?? o;
+    if (typeof r != "object" || r === null)
+      throw new Error(`Locale module ${e} did not export an object`);
+    u.value[e] = u.value[e] || {}, u.value[e][t] = v(
+      u.value[e]?.[t] || {},
+      r
+    ), s.value.push(t), await g("__data_locale_" + t, r);
   } catch {
-    let n = localStorage.getItem("__data_locale_" + e);
-    n && (u.value[t][e] = d(u.value[t]?.[e] || {}, JSON.parse(n)), c.value.push(e));
+    const r = await j("__data_locale_" + t);
+    r && (u.value[e][t] = v(
+      u.value[e]?.[t] || {},
+      r
+    ), s.value.push(t));
   }
 }
-async function v(t) {
-  for (let e of f.value) {
-    const r = e.template.replace("{locale}", encodeURIComponent(t));
-    w(t, e.name, r);
+async function p(e) {
+  for (let t of f.value) {
+    const n = t.template.replace(
+      "{locale}",
+      encodeURIComponent(e)
+    );
+    L(e, t.name, n);
   }
 }
-async function L(t) {
-  l.value = t, await v(t);
+async function S(e) {
+  a.value = e, await p(e);
 }
-function b(t) {
-  s = t;
-}
-function m() {
-  return l.value;
-}
-function j(t) {
-  return function(e, r = {}) {
-    const o = u.value[l.value]?.[t] || {};
-    let n = p(o, e);
-    if (n === void 0 && l.value !== s) {
-      const i = u.value[s]?.[t] || {};
-      n = p(i, e);
-    }
-    if (n === void 0)
-      return g(e, r);
-    if (typeof n == "function")
-      try {
-        return n(r);
-      } catch (i) {
-        return console.warn("i18n function error for key", e, i), "";
-      }
-    return g(n, r);
-  };
+function x(e) {
+  d = e;
 }
 function A() {
-  return {
-    locale: y(() => l.value),
-    isLocaleLoaded: (t) => c.value.includes(t),
-    setFallbackLocale: b,
-    setLocale: L,
-    addLocaleModule: h,
-    getLocale: m
+  return a.value;
+}
+function E(e) {
+  return function(t, n = {}) {
+    const o = u.value[a.value]?.[e] || {};
+    let r = w(o, t);
+    if (r === void 0 && a.value !== d) {
+      const c = u.value[d]?.[e] || {};
+      r = w(c, t);
+    }
+    if (r === void 0)
+      return b(t, n);
+    if (typeof r == "function")
+      try {
+        return r(n);
+      } catch (c) {
+        return console.warn("i18n function error for key", t, c), "";
+      }
+    return b(r, n);
   };
 }
-_(
-  l,
-  async (t, e) => {
-    e !== void 0 && await v(t);
+function M() {
+  return {
+    locale: h(() => a.value),
+    isLocaleLoaded: (e) => s.value.includes(e),
+    setFallbackLocale: x,
+    setLocale: S,
+    addLocaleModule: D,
+    getLocale: A
+  };
+}
+y(
+  a,
+  async (e, t) => {
+    t !== void 0 && await p(e);
   },
   { immediate: !0 }
 );
 export {
-  A as useI18n,
-  j as useTranslator
+  M as useI18n,
+  E as useTranslator
 };

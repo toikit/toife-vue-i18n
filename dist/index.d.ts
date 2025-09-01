@@ -1,3 +1,4 @@
+/** --------------------------------------------------- */
 /** Set a new base URL template if needed */
 declare function addLocaleModule(template: any): void;
 /** Set current locale (async loads if needed) */
