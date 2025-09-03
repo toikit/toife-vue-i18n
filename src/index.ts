@@ -197,7 +197,7 @@ export function useTranslator(name: string) {
 /** Composable for Vue components */
 export function useI18n() {
   return {
-    locale: computed(() => locale.value),
+    locale,
     isLocaleLoaded: (name: string) => loaded.value.includes(name),
     setFallbackLocale,
     setLocale,
@@ -207,8 +207,7 @@ export function useI18n() {
 }
 
 /** Auto fallback: if locale ref changes and its dictionary isn't loaded, load it */
-watch(
-  locale,
+watch(() => locale.value,
   async (newVal, olVal) => {
     if (olVal !== undefined) {
       await loadLocale(newVal);

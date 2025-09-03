@@ -1,9 +1,9 @@
-import { ref as l, watch as y, computed as h } from "vue";
+import { ref as l, watch as y } from "vue";
 let f = l([]), d = "";
-const u = l({}), s = l([]), a = l(""), m = "i18nDB", i = "locales";
+const u = l({}), s = l([]), a = l(""), h = "i18nDB", i = "locales";
 function _() {
   return new Promise((e, t) => {
-    const n = indexedDB.open(m, 1);
+    const n = indexedDB.open(h, 1);
     n.onupgradeneeded = () => {
       const o = n.result;
       o.objectStoreNames.contains(i) || o.createObjectStore(i);
@@ -24,7 +24,7 @@ async function j(e) {
     c.onsuccess = () => n(c.result), c.onerror = () => o(c.error);
   });
 }
-function D(e) {
+function m(e) {
   Array.isArray(e) ? e.forEach((t) => {
     f.value.push(t);
   }) : f.value.push(e), p(a.value);
@@ -52,7 +52,7 @@ function w(e, t) {
 function b(e, t = {}) {
   return String(e).replace(/\{(\w+)\}/g, (n, o) => t[o] === void 0 ? `{${o}}` : String(t[o]));
 }
-async function L(e, t, n) {
+async function D(e, t, n) {
   try {
     if (s.value.includes(t)) return;
     const o = await import(
@@ -79,19 +79,19 @@ async function p(e) {
       "{locale}",
       encodeURIComponent(e)
     );
-    L(e, t.name, n);
+    D(e, t.name, n);
   }
 }
-async function S(e) {
+async function L(e) {
   a.value = e, await p(e);
 }
-function x(e) {
+function S(e) {
   d = e;
 }
-function A() {
+function x() {
   return a.value;
 }
-function E(e) {
+function B(e) {
   return function(t, n = {}) {
     const o = u.value[a.value]?.[e] || {};
     let r = w(o, t);
@@ -110,24 +110,24 @@ function E(e) {
     return b(r, n);
   };
 }
-function M() {
+function E() {
   return {
-    locale: h(() => a.value),
+    locale: a,
     isLocaleLoaded: (e) => s.value.includes(e),
-    setFallbackLocale: x,
-    setLocale: S,
-    addLocaleModule: D,
-    getLocale: A
+    setFallbackLocale: S,
+    setLocale: L,
+    addLocaleModule: m,
+    getLocale: x
   };
 }
 y(
-  a,
+  () => a.value,
   async (e, t) => {
     t !== void 0 && await p(e);
   },
   { immediate: !0 }
 );
 export {
-  M as useI18n,
-  E as useTranslator
+  E as useI18n,
+  B as useTranslator
 };

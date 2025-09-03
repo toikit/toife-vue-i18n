@@ -10,7 +10,7 @@ declare function getLocale(): string;
 export declare function useTranslator(name: string): (key: string, params?: {}) => any;
 /** Composable for Vue components */
 export declare function useI18n(): {
-    locale: import('vue').ComputedRef<string>;
+    locale: import('vue').Ref<string, string>;
     isLocaleLoaded: (name: string) => any;
     setFallbackLocale: typeof setFallbackLocale;
     setLocale: typeof setLocale;
