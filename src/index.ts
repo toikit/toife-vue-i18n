@@ -132,6 +132,7 @@ async function __load(localeKey: string, name: string, url: string) {
     // Lấy từ IndexedDB khi lỗi
     const msgs = await loadFromDB('__data_locale_' + name);
     if (msgs) {
+      dictionaries.value[localeKey] = dictionaries.value[localeKey] || {};
       dictionaries.value[localeKey][name] = mergeDeep(
         dictionaries.value[localeKey]?.[name] || {},
         msgs
