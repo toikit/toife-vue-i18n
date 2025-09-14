@@ -172,6 +172,13 @@ function getLocale() {
   return locale.value;
 }
 
+async function addMessage(name:string, msgs:any) {
+  for (let localeKey in msgs) {
+    if (!msgs.hasOwnProperty(localeKey)) continue;
+    await __save(localeKey, name, msgs[localeKey]);
+  }
+}
+
 /** Core translate function */
 export function useTranslator(name: string) {
   return function (key: string, params = {}) {
@@ -207,7 +214,7 @@ export function useI18n() {
     setFallbackLocale,
     setLocale,
     addLocaleModule,
-    addMessage: __save,
+    addMessage,
     getLocale,
   };
 }

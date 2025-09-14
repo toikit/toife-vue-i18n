@@ -1,12 +1,12 @@
 /** --------------------------------------------------- */
 /** Set a new base URL template if needed */
 declare function addLocaleModule(template: any): void;
-declare function __save(localeKey: string, name: string, msgs: any): Promise<void>;
 /** Set current locale (async loads if needed) */
 declare function setLocale(newLocale: string): Promise<void>;
 declare function setFallbackLocale(l: string): void;
 /** Get current locale string */
 declare function getLocale(): string;
+declare function addMessage(name: string, msgs: any): Promise<void>;
 /** Core translate function */
 export declare function useTranslator(name: string): (key: string, params?: {}) => any;
 /** Composable for Vue components */
@@ -16,7 +16,7 @@ export declare function useI18n(): {
     setFallbackLocale: typeof setFallbackLocale;
     setLocale: typeof setLocale;
     addLocaleModule: typeof addLocaleModule;
-    addMessage: typeof __save;
+    addMessage: typeof addMessage;
     getLocale: typeof getLocale;
 };
 export {};

@@ -60,7 +60,7 @@ async function y(t, e, o) {
     o
   ), s.value.push(e), await D("__data_locale_" + e, o);
 }
-async function g(t, e, o) {
+async function x(t, e, o) {
   try {
     if (s.value.includes(e)) return;
     const n = await import(
@@ -82,19 +82,23 @@ async function p(t) {
       "{locale}",
       encodeURIComponent(t)
     );
-    g(t, e.name, o);
+    x(t, e.name, o);
   }
 }
-async function x(t) {
+async function A(t) {
   u.value = t, await p(t);
 }
-function A(t) {
+function B(t) {
   d = t;
 }
-function B() {
+function E() {
   return u.value;
 }
-function E(t) {
+async function M(t, e) {
+  for (let o in e)
+    e.hasOwnProperty(o) && await y(o, t, e[o]);
+}
+function N(t) {
   return function(e, o = {}) {
     const n = a.value[u.value]?.[t] || {};
     let r = w(n, e);
@@ -113,15 +117,15 @@ function E(t) {
     return _(r, o);
   };
 }
-function M() {
+function O() {
   return {
     locale: u,
     isLocaleLoaded: (t) => s.value.includes(t),
-    setFallbackLocale: A,
-    setLocale: x,
+    setFallbackLocale: B,
+    setLocale: A,
     addLocaleModule: S,
-    addMessage: y,
-    getLocale: B
+    addMessage: M,
+    getLocale: E
   };
 }
 h(
@@ -132,6 +136,6 @@ h(
   { immediate: !0 }
 );
 export {
-  M as useI18n,
-  E as useTranslator
+  O as useI18n,
+  N as useTranslator
 };
