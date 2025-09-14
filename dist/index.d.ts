@@ -1,6 +1,7 @@
 /** --------------------------------------------------- */
 /** Set a new base URL template if needed */
 declare function addLocaleModule(template: any): void;
+declare function __save(localeKey: string, name: string, msgs: any): Promise<void>;
 /** Set current locale (async loads if needed) */
 declare function setLocale(newLocale: string): Promise<void>;
 declare function setFallbackLocale(l: string): void;
@@ -15,6 +16,7 @@ export declare function useI18n(): {
     setFallbackLocale: typeof setFallbackLocale;
     setLocale: typeof setLocale;
     addLocaleModule: typeof addLocaleModule;
+    addMessage: typeof __save;
     getLocale: typeof getLocale;
 };
 export {};

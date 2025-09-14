@@ -109,25 +109,29 @@ function interpolate(str: any, params: any = {}) {
   });
 }
 
+async function __save(localeKey: string, name: string, msgs: any){
+  if (typeof msgs !== 'object' || msgs === null) {
+    throw new Error(`Locale module ${localeKey} did not export an object`);
+  }
+
+  dictionaries.value[localeKey] = dictionaries.value[localeKey] || {};
+  dictionaries.value[localeKey][name] = mergeDeep(
+    dictionaries.value[localeKey]?.[name] || {},
+    msgs
+  );
+  loaded.value.push(name);
+
+  // Lưu vào IndexedDB thay vì localStorage
+  await saveToDB('__data_locale_' + name, msgs);
+}
+
 async function __load(localeKey: string, name: string, url: string) {
   try {
     if (loaded.value.includes(name)) return;
 
     const module = await import(/* @vite-ignore */ url + '?t=' + Date.now());
     const msgs = module.default ?? module;
-    if (typeof msgs !== 'object' || msgs === null) {
-      throw new Error(`Locale module ${localeKey} did not export an object`);
-    }
-
-    dictionaries.value[localeKey] = dictionaries.value[localeKey] || {};
-    dictionaries.value[localeKey][name] = mergeDeep(
-      dictionaries.value[localeKey]?.[name] || {},
-      msgs
-    );
-    loaded.value.push(name);
-
-    // Lưu vào IndexedDB thay vì localStorage
-    await saveToDB('__data_locale_' + name, msgs);
+    await __save(localeKey, name, msgs);
   } catch (e) {
     // Lấy từ IndexedDB khi lỗi
     const msgs = await loadFromDB('__data_locale_' + name);
@@ -203,6 +207,7 @@ export function useI18n() {
     setFallbackLocale,
     setLocale,
     addLocaleModule,
+    addMessage: __save,
     getLocale,
   };
 }
