@@ -180,7 +180,7 @@ async function addMessage(name:string, msgs:any) {
 }
 
 /** Core translate function */
-export function useTranslator(name: string) {
+export function useTranslator(name: string = 'default') {
   return function (key: string, params = {}) {
     const primary = dictionaries.value[locale.value]?.[name] || {};
     let entry = getNested(primary, key);

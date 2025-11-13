@@ -98,7 +98,7 @@ async function M(t, e) {
   for (let o in e)
     e.hasOwnProperty(o) && await y(o, t, e[o]);
 }
-function N(t) {
+function N(t = "default") {
   return function(e, o = {}) {
     const n = a.value[u.value]?.[t] || {};
     let r = w(n, e);
