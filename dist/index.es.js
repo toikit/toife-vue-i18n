@@ -1,118 +1,118 @@
-import { ref as l, watch as h } from "vue";
-let f = l([]), d = "";
-const a = l({}), s = l([]), u = l(""), j = "i18nDB", i = "locales";
+import { ref as f, watch as h } from "vue";
+let d = f([]), l = "";
+const a = f({}), s = f([]), u = f(""), j = "i18nDB", i = "locales";
 function b() {
-  return new Promise((t, e) => {
+  return new Promise((e, t) => {
     const o = indexedDB.open(j, 1);
     o.onupgradeneeded = () => {
       const n = o.result;
       n.objectStoreNames.contains(i) || n.createObjectStore(i);
-    }, o.onsuccess = () => t(o.result), o.onerror = () => e(o.error);
+    }, o.onsuccess = () => e(o.result), o.onerror = () => t(o.error);
   });
 }
-async function D(t, e) {
+async function D(e, t) {
   const o = await b();
   return new Promise((n, r) => {
     const c = o.transaction(i, "readwrite");
-    c.objectStore(i).put(e, t), c.oncomplete = () => n(), c.onerror = () => r(c.error);
+    c.objectStore(i).put(t, e), c.oncomplete = () => n(), c.onerror = () => r(c.error);
   });
 }
-async function L(t) {
-  const e = await b();
+async function L(e) {
+  const t = await b();
   return new Promise((o, n) => {
-    const c = e.transaction(i, "readonly").objectStore(i).get(t);
+    const c = t.transaction(i, "readonly").objectStore(i).get(e);
     c.onsuccess = () => o(c.result), c.onerror = () => n(c.error);
   });
 }
-function S(t) {
-  Array.isArray(t) ? t.forEach((e) => {
-    f.value.push(e);
-  }) : f.value.push(t), p(u.value);
+function S(e) {
+  Array.isArray(e) ? e.forEach((t) => {
+    d.value.push(t);
+  }) : d.value.push(e), p(u.value);
 }
-function v(t = {}, e = {}) {
-  for (const o of Object.keys(e)) {
-    const n = e[o], r = t[o];
-    n && typeof n == "object" && !Array.isArray(n) && !(n instanceof Function) ? t[o] = v(
+function v(e = {}, t = {}) {
+  for (const o of Object.keys(t)) {
+    const n = t[o], r = e[o];
+    n && typeof n == "object" && !Array.isArray(n) && !(n instanceof Function) ? e[o] = v(
       r && typeof r == "object" ? r : {},
       n
-    ) : t[o] = n;
+    ) : e[o] = n;
   }
-  return t;
+  return e;
 }
-function w(t, e) {
-  if (!t) return;
-  const o = e.split(".");
-  let n = t;
+function w(e, t) {
+  if (!e) return;
+  const o = t.split(".");
+  let n = e;
   for (const r of o) {
     if (n == null) return;
     n = n[r];
   }
   return n;
 }
-function _(t, e = {}) {
-  return String(t).replace(/\{(\w+)\}/g, (o, n) => e[n] === void 0 ? `{${n}}` : String(e[n]));
+function _(e, t = {}) {
+  return String(e).replace(/\{(\w+)\}/g, (o, n) => t[n] === void 0 ? `{${n}}` : String(t[n]));
 }
-async function y(t, e, o) {
+async function y(e, t, o) {
   if (typeof o != "object" || o === null)
-    throw new Error(`Locale module ${t} did not export an object`);
-  a.value[t] = a.value[t] || {}, a.value[t][e] = v(
-    a.value[t]?.[e] || {},
+    throw new Error(`Locale module ${e} did not export an object`);
+  a.value[e] = a.value[e] || {}, a.value[e][t] = v(
+    a.value[e]?.[t] || {},
     o
-  ), s.value.push(e), await D("__data_locale_" + e, o);
+  ), s.value.push(t), await D("__data_locale_" + t, o);
 }
-async function x(t, e, o) {
+async function x(e, t, o) {
   try {
-    if (s.value.includes(e)) return;
+    if (s.value.includes(t)) return;
     const n = await import(
       /* @vite-ignore */
       o + "?t=" + Date.now()
     ), r = n.default ?? n;
-    await y(t, e, r);
+    await y(e, t, r);
   } catch {
-    const r = await L("__data_locale_" + e);
-    r && (a.value[t] = a.value[t] || {}, a.value[t][e] = v(
-      a.value[t]?.[e] || {},
+    const r = await L("__data_locale_" + t);
+    r && (a.value[e] = a.value[e] || {}, a.value[e][t] = v(
+      a.value[e]?.[t] || {},
       r
-    ), s.value.push(e));
+    ), s.value.push(t));
   }
 }
-async function p(t) {
-  for (let e of f.value) {
-    const o = e.template.replace(
+async function p(e) {
+  for (let t of d.value) {
+    const o = t.template.replace(
       "{locale}",
-      encodeURIComponent(t)
+      encodeURIComponent(e)
     );
-    x(t, e.name, o);
+    x(e, t.name, o);
   }
 }
-async function A(t) {
-  u.value = t, await p(t);
+async function A(e) {
+  u.value = e, await p(e);
 }
-function B(t) {
-  d = t;
+function B(e) {
+  l = e;
 }
 function E() {
   return u.value;
 }
-async function M(t, e) {
-  for (let o in e)
-    e.hasOwnProperty(o) && await y(o, t, e[o]);
+async function M(e, t) {
+  for (let o in t)
+    t.hasOwnProperty(o) && await y(o, e, t[o]);
 }
-function N(t = "default") {
-  return function(e, o = {}) {
-    const n = a.value[u.value]?.[t] || {};
-    let r = w(n, e);
-    if (r === void 0 && u.value !== d) {
-      const c = a.value[d]?.[t] || {};
-      r = w(c, e);
+function N(e = null) {
+  return function(t, o = {}) {
+    const n = e ? a.value[u.value]?.[e] : a.value[u.value] || {};
+    let r = w(n, t);
+    if (r === void 0 && u.value !== l) {
+      const c = e ? a.value[l]?.[e] : a.value[l] || {};
+      r = w(c, t);
     }
     if (r === void 0)
-      return _(e, o);
+      return _(t, o);
     if (typeof r == "function")
       try {
         return r(o);
       } catch (c) {
-        return console.warn("i18n function error for key", e, c), "";
+        return console.warn("i18n function error for key", t, c), "";
       }
     return _(r, o);
   };
@@ -120,7 +120,7 @@ function N(t = "default") {
 function O() {
   return {
     locale: u,
-    isLocaleLoaded: (t) => s.value.includes(t),
+    isLocaleLoaded: (e) => s.value.includes(e),
     setFallbackLocale: B,
     setLocale: A,
     addLocaleModule: S,
@@ -130,8 +130,8 @@ function O() {
 }
 h(
   () => u.value,
-  async (t, e) => {
-    e !== void 0 && await p(t);
+  async (e, t) => {
+    t !== void 0 && await p(e);
   },
   { immediate: !0 }
 );

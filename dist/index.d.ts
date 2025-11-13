@@ -8,7 +8,7 @@ declare function setFallbackLocale(l: string): void;
 declare function getLocale(): string;
 declare function addMessage(name: string, msgs: any): Promise<void>;
 /** Core translate function */
-export declare function useTranslator(name?: string): (key: string, params?: {}) => any;
+export declare function useTranslator(name?: any): (key: string, params?: {}) => any;
 /** Composable for Vue components */
 export declare function useI18n(): {
     locale: import('vue').Ref<string, string>;

@@ -1,6 +1,6 @@
 {
   "name": "@toife/vue-i18n",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Plugins locale messages for Vue",
   "type": "module",
   "main": "dist/index.umd.js",

@@ -180,13 +180,13 @@ async function addMessage(name:string, msgs:any) {
 }
 
 /** Core translate function */
-export function useTranslator(name: string = 'default') {
+export function useTranslator(name: any = null) {
   return function (key: string, params = {}) {
-    const primary = dictionaries.value[locale.value]?.[name] || {};
+    const primary = name ? dictionaries.value[locale.value]?.[name] : dictionaries.value[locale.value] || {};
     let entry = getNested(primary, key);
 
     if (entry === undefined && locale.value !== fallbackLocale) {
-      const fb = dictionaries.value[fallbackLocale]?.[name] || {};
+      const fb = name ? dictionaries.value[fallbackLocale]?.[name] : dictionaries.value[fallbackLocale] || {};
       entry = getNested(fb, key);
     }
 
