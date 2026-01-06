@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 /** Base URL template for locale modules; replace `{locale}` when loading */
 let localeModuleTemplates = ref<Array<any>>([]);
